@@ -10,6 +10,7 @@ If you have enough data in the past, the forecast will be based on same week day
 
 The power usage forecast can be used together with a solar power forecast to make a battery level forecast
 
+[Read more here on my website](https://www.dingus.dk/power-usage-forecast/)
 
 ## Installation
 
