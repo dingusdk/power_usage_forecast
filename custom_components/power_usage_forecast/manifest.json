@@ -9,10 +9,9 @@
     "recorder"
   ],
   "documentation": "https://github.com/dingusdk/power_usage_forecast",
-  "issue_tracker": "https://github.com/dingusdk/power_usage_forecast/issues",
-  "homekit": {},
   "integration_type": "helper",
   "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/dingusdk/power_usage_forecast/issues",
   "quality_scale": "bronze",
   "requirements": [],
   "version": "2025.11.1"
