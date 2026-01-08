@@ -1,0 +1,69 @@
+homeassistant:
+  name: Home
+  unit_system: metric
+  time_zone: Europe/Copenhagen
+  debug: true
+
+default_config:
+# integrations below are from the default_config
+assist_pipeline:
+backup:
+#bluetooth:
+config:
+# Allows you to issue voice commands from the frontend in enabled browsers
+conversation:
+#dhcp:
+energy:
+#go2rtc
+history:
+homeassistant_alerts:
+#image_upload:
+logbook:
+#media_source:
+#mobile_app:
+#my:
+#ssdp:
+# stream:
+# Track the sun
+#sun:
+#usage_prediction:
+#usb:
+#webhook:
+#zeroconf:
+# END OF default_config
+
+logger:
+  default: info
+  logs:
+    custom_components.power_usage_forecast: debug
+
+recorder:
+
+# This integration is used to call Google Translate TTS
+# it should not really be here but I get a error without it
+# tts:
+#   - platform: google_translate
+
+sensor:
+  - platform: random
+    name: Forbrugssimulering
+    minimum: 100
+    maximum: 500
+    unit_of_measurement: "W"
+    scan_interval: 00:01:00
+  - platform: integration
+    name: Forbrugssimulering Total
+    source: sensor.forbrugssimuleringssensor
+    unit_time: h
+    round: 2
+    method: left
+    scan_interval: 00:01:00
+
+
+template:
+  - sensor:
+      - name: "Forbrugssimuleringssensor"
+        state: >
+          {{ states('sensor.forbrugssimulering')|float }}
+        unit_of_measurement: "W"
+        device_class: power

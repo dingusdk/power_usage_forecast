@@ -1,0 +1,18 @@
+{
+  "domain": "power_usage_forecast",
+  "name": "Power Usage Forecast",
+  "codeowners": [
+    "@dingusdk"
+  ],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/dingusdk/power_usage_forecast",
+  "homekit": {},
+  "integration_type": "helper",
+  "iot_class": "local_polling",
+  "quality_scale": "bronze",
+  "requirements": [],
+  "ssdp": [],
+  "zeroconf": [],
+  "version": "2025.11.1"
+}

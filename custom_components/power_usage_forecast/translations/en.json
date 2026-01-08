@@ -1,0 +1,25 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "description": "New power usage forecast Sensor",
+                "data": {
+                    "entity_id": "Energy sensor sensor",
+                    "name": "Name"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "entity_id": "[%key:component::power_usage_forecast::config::step::user::description%]",
+                    "days": "Number of days to go back for forecast calculation",
+                    "result_days": "Number of days in forecast",
+                    "forecast_method": "Forecast method"
+                }
+            }
+        }
+    }
+}
