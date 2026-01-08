@@ -5,7 +5,9 @@
     "@dingusdk"
   ],
   "config_flow": true,
-  "dependencies": [],
+  "dependencies": [
+    "recorder"
+  ],
   "documentation": "https://github.com/dingusdk/power_usage_forecast",
   "homekit": {},
   "integration_type": "helper",
