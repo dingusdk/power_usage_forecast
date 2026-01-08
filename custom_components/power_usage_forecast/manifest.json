@@ -14,7 +14,5 @@
   "iot_class": "local_polling",
   "quality_scale": "bronze",
   "requirements": [],
-  "ssdp": [],
-  "zeroconf": [],
   "version": "2025.11.1"
 }
