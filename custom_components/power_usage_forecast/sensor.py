@@ -105,6 +105,7 @@ class PowerUsageforecastSensorEntity(SensorEntity):
             "source": self._wrapped_entity_id,
             "days": self._days,
             "method": self._method,
+            "weekday_forecast": False,
             "forecast": [],
         }
         self._update_unsub = None
@@ -153,6 +154,7 @@ class PowerUsageforecastSensorEntity(SensorEntity):
         """Query recorder/history for the wrapped entity and update attributes."""
         _LOGGER.debug("Update power usage forecast %s", now.isoformat())
         now = dt_util.now()
+        weekday_forecast: bool = True
         forecast: list[ForecastEntry] = []
         for r in range(self._result_days):
             forecast_one_day = await self._get_estimated_houly_usage_by_weekday(
@@ -163,10 +165,8 @@ class PowerUsageforecastSensorEntity(SensorEntity):
                 break
             forecast.extend(forecast_one_day)
         if len(forecast) == 0:
-            _LOGGER.warning(
-                "Fallback to all days because of not enough data for weekday forecast"
-            )
             # Fallback to forecast for all days equal if not enough data
+            weekday_forecast = False
             forecast_one_day = await self._get_estimated_houly_usage(now)
             for r in range(self._result_days):
                 for entry in forecast_one_day:
@@ -191,6 +191,7 @@ class PowerUsageforecastSensorEntity(SensorEntity):
                 "min_forecast": min(e.min for e in forecast),
                 "max_1day": sum(e.max for e in forecast),
                 "min_1day": sum(e.min for e in forecast),
+                "weekday_forecast": weekday_forecast,
             }
         )
         _LOGGER.debug(
@@ -284,7 +285,7 @@ class PowerUsageforecastSensorEntity(SensorEntity):
         return forecast
 
     async def _get_estimated_houly_usage_by_weekday(
-        self, now: datetime
+        self, result_day_time: datetime
     ) -> list[ForecastEntry] | None:
         """
         Get estimated hourly usage based on past days.
@@ -292,14 +293,25 @@ class PowerUsageforecastSensorEntity(SensorEntity):
         First we get the usage for each of the past N days, then for each hour
         we compute the average and median usage across those days.
         """
+        _LOGGER.debug(
+            "Get estimated hourly usage by weekday for %s", result_day_time.isoformat()
+        )
         # Build a matrix of past usage data. day,hour
         day_matrix: list[list[float]] = []
         for day in range(self._days):
-            start = now - timedelta(days=day * 7)
+            start = result_day_time - timedelta(days=day * 7)
+            # make sure we don't go into the future, if so, go back a week
+            while start > utcnow():
+                start -= timedelta(days=7)
             day_data = await self.get_usage_for_day(start)
             if day_data is not None:
                 day_matrix.append(day_data)
         if len(day_matrix) < self._days:
+            _LOGGER.debug(
+                "Not enough data to calculate weekday forecast (%d < %d)",
+                len(day_matrix),
+                self._days,
+            )
             return None
         _LOGGER.debug("Enough data to calculate weekday forecast")
         forecast: list[ForecastEntry] = []
@@ -309,7 +321,7 @@ class PowerUsageforecastSensorEntity(SensorEntity):
                 wh = day_matrix[day][hour]
                 if wh > 0:
                     hourdata.append(wh)
-            time = now.replace(hour=hour, minute=0, second=0, microsecond=0)
+            time = result_day_time.replace(hour=hour, minute=0, second=0, microsecond=0)
             if len(hourdata) == 0:
                 forecast.append(ForecastEntry(time=time, wh=0, max=0, min=0))
                 continue
